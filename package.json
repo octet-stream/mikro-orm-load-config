@@ -10,6 +10,7 @@
     "module-sync": "./lib/load-config.js",
     "default": "./lib/load-config.js"
   },
+  "files": ["lib"],
   "scripts": {
     "build": "del-cli lib && tsup-node",
     "test": "pnpm vitest run",
