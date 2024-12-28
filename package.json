@@ -1,0 +1,38 @@
+{
+  "type": "module",
+  "name": "mikro-orm-load-config",
+  "version": "1.0.0",
+  "description": "Mikro ORM improved load config proposal",
+  "main": "./lib/load-config.js",
+  "types": "./lib/load-config.d.ts",
+  "exports": {
+    "types": "./lib/load-config.d.ts",
+    "module-sync": "./lib/load-config.js",
+    "default": "./lib/load-config.js"
+  },
+  "scripts": {
+    "build": "del-cli lib && tsup-node",
+    "test": "pnpm vitest run",
+    "tes.ui": "pnpm vitest --ui"
+  },
+  "keywords": [],
+  "author": "Nick K.",
+  "dependencies": {
+    "lilconfig": "3.1.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.4",
+    "@mikro-orm/better-sqlite": "6.4.2",
+    "@mikro-orm/core": "6.4.2",
+    "@types/node": "22.10.2",
+    "@vitest/coverage-v8": "2.1.8",
+    "@vitest/ui": "2.1.8",
+    "del-cli": "6.0.0",
+    "jiti": "2.4.2",
+    "reflect-metadata": "0.2.2",
+    "tsup": "8.3.5",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2",
+    "vitest": "2.1.8"
+  }
+}

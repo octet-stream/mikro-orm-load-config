@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "noEmit": true,
+    "allowJs": true,
+    "strict": true,
+    "target": "esnext",
+    "module": "nodenext",
+    "moduleResolution": "node16",
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noUncheckedIndexedAccess": true,
+    "allowImportingTsExtensions": true
+  }
+}

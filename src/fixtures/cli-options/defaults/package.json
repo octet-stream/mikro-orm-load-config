@@ -1,0 +1,6 @@
+{
+  "type": "module",
+  "mikro-orm": {
+    "alwaysAllowTs": true
+  }
+}
