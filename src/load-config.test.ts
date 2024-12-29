@@ -2,7 +2,7 @@ import {resolve, join} from "node:path"
 
 import {describe, test, expect} from "vitest"
 
-import {loadConfig} from "./load-config.ts"
+import {loadConfig, LoadConfigError} from "./load-config.ts"
 
 const FIXTURES_ROOT = resolve(import.meta.dirname, "fixtures", "configs")
 
@@ -24,4 +24,14 @@ describe("auto detect", () => {
 
     expect(actual.config).toMatchObject(expected.default)
   })
+})
+
+test("Throws error if no config found", async () => {
+  try {
+    await loadConfig(
+      resolve(import.meta.dirname, "fixtures", "cli-options", "defaults")
+    )
+  } catch (error) {
+    expect(error).toBeInstanceOf(LoadConfigError)
+  }
 })
