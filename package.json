@@ -14,7 +14,8 @@
   "scripts": {
     "build": "del-cli lib && tsup-node",
     "test": "pnpm vitest run",
-    "tes.ui": "pnpm vitest --ui"
+    "test.ui": "pnpm vitest --ui",
+    "prepare": "npx --yes is-in-ci || husky"
   },
   "keywords": [],
   "author": "Nick K.",
@@ -29,6 +30,7 @@
     "@vitest/coverage-v8": "2.1.8",
     "@vitest/ui": "2.1.8",
     "del-cli": "6.0.0",
+    "husky": "9.1.7",
     "jiti": "2.4.2",
     "reflect-metadata": "0.2.2",
     "tsup": "8.3.5",
