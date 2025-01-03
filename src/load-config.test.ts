@@ -32,7 +32,6 @@ test("Throws error if no config found", async () => {
       resolve(import.meta.dirname, "fixtures", "cli-options", "defaults")
     )
   } catch (error) {
-    console.log(error)
     expect(error).toBeInstanceOf(LoadConfigError)
   }
 })

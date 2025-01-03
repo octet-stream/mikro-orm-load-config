@@ -17,7 +17,7 @@ export type CreateConfigLoader = (
 ) => ConfigLoader | Promise<ConfigLoader>
 
 const createNativeLoader: CreateConfigLoader = (): ConfigLoader => ({
-  name: "import",
+  name: "native",
   import: async id => requireDefault(await import(id)) as Options
 })
 
