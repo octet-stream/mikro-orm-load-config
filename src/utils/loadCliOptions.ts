@@ -20,10 +20,10 @@ interface PackageSlice {
 }
 
 export async function loadCliOptions(
-  pwd: string
+  projectRootFolder: string
 ): Promise<Required<CliOptions>> {
   const pkg: PackageSlice = JSON.parse(
-    await readFile(join(pwd, "package.json"), "utf-8")
+    await readFile(join(projectRootFolder, "package.json"), "utf-8")
   )
 
   return {...defaults, ...pkg["mikro-orm"]}

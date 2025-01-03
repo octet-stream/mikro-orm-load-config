@@ -29,8 +29,8 @@ export type LoadedConfigResult = Replace<
 >
 
 export class LoadConfigError extends Error {
-  constructor(rootFile: string, options?: ErrorOptions) {
-    super(`Unable to load Mikro ORM config at ${rootFile}`, options)
+  constructor(searchFrom: string, options?: ErrorOptions) {
+    super(`Unable to load Mikro ORM config at ${searchFrom}`, options)
   }
 }
 
@@ -38,18 +38,18 @@ export class LoadConfigError extends Error {
  * Loads Mikro ORM config
  */
 export async function loadConfig(
-  rootFile = process.cwd()
+  searchFrom = process.cwd()
 ): Promise<LoadedConfigResult> {
-  const options = await loadCliOptions(rootFile)
-  const loader = await createLoader(rootFile, options)
+  const options = await loadCliOptions(searchFrom)
+  const loader = await createLoader(searchFrom, options)
 
   const result = await lilconfig(name, {
     searchPlaces: [...options.configPaths, ...configNameVariants],
     loaders: withLoaders(loader.import)
-  }).search(rootFile)
+  }).search(searchFrom)
 
   if (!result) {
-    throw new LoadConfigError(rootFile)
+    throw new LoadConfigError(searchFrom)
   }
 
   return result
