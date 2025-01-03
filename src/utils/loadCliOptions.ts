@@ -1,7 +1,7 @@
 import {readFile} from "node:fs/promises"
 import {join} from "node:path"
 
-export type ConfigLoader = "auto" | "jiti" | "tsx" | false
+export type ConfigLoader = "auto" | "jiti" | "tsx" | "native" | false
 
 export interface CliOptions {
   alwaysAllowTs?: boolean // I think it should be deprecated in favoir of loader option set to `false`
