@@ -1,8 +1,8 @@
-import {resolve, join} from "node:path"
+import {join, resolve} from "node:path"
 
-import {describe, test, expect} from "vitest"
+import {describe, expect, test} from "vitest"
 
-import {createLoader, type ConfigLoader} from "./createLoader.ts"
+import {type ConfigLoader, createLoader} from "./createLoader.ts"
 
 const FIXTURES_ROOT = resolve(import.meta.dirname, "..", "fixtures", "loaders")
 
@@ -16,9 +16,7 @@ const createLoaderSuite = (name: string, loader: ConfigLoader) =>
     ;["ts", "mts", "cts", "js", "cjs", "mjs"].forEach(extname => {
       test(`loads ${extname} file`, async () => {
         const expected = await import(`../fixtures/loaders/config.${extname}`)
-        const actual = await loader.importModule(
-          join(FIXTURES_ROOT, "config.ts")
-        )
+        const actual = await loader.import(join(FIXTURES_ROOT, "config.ts"))
 
         expect(actual).toMatchObject(expected.default)
       })
@@ -48,7 +46,7 @@ describe("disabled", () => {
     const expected = await import("../fixtures/loaders/config.js")
 
     const loader = await createLoader(FIXTURES_ROOT, {loader: false})
-    const actual = await loader.importModule(join(FIXTURES_ROOT, "config.js"))
+    const actual = await loader.import(join(FIXTURES_ROOT, "config.js"))
 
     expect(actual).toMatchObject(expected.default)
   })

@@ -1,6 +1,6 @@
-import {test, expect} from "vitest"
+import {expect, test} from "vitest"
 
-import {tryModule, ModuleImportError} from "./tryModule.ts"
+import {ModuleImportError, tryModule} from "./tryModule.ts"
 
 test("Resolves given import() promise", async () => {
   const promise = import("../fixtures/loaders/config.ts")

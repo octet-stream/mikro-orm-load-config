@@ -1,8 +1,8 @@
-import {resolve, join} from "node:path"
+import {join, resolve} from "node:path"
 
-import {test, expect} from "vitest"
+import {expect, test} from "vitest"
 
-import {loadCliOptions, defaults} from "./loadCliOptions.ts"
+import {defaults, loadCliOptions} from "./loadCliOptions.ts"
 
 const FIXTURES_ROOT = resolve(
   import.meta.dirname,

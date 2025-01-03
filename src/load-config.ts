@@ -1,23 +1,22 @@
-import type {LilconfigResult, Loader, Loaders} from "lilconfig"
 import type {Options} from "@mikro-orm/core"
+import type {LilconfigResult, Loader, Loaders} from "lilconfig"
 import {lilconfig} from "lilconfig"
 
+import {concat} from "./utils/concat.ts"
+import {createConfigNameVariants} from "./utils/createConfigNameVariants.ts"
+import {createExtnameVariants} from "./utils/createExtnameVariants.ts"
 import {createLoader} from "./utils/createLoader.ts"
 import {loadCliOptions} from "./utils/loadCliOptions.ts"
 import type {Replace} from "./utils/types/Replace.ts"
 
-const base = "mikro-orm.config"
+const extnames = concat(
+  createExtnameVariants("ts", ["", "m", "c"]),
+  createExtnameVariants("js", ["", "m", "c"])
+)
 
-const searchPlaces = [
-  `${base}.ts`,
-  `${base}.mts`,
-  `${base}.cts`,
-  `${base}.js`,
-  `${base}.mjs`,
-  `${base}.cjs`
-] as const
-
-const extnames = [".ts", ".mts", ".cts", ".js", ".mjs", ".cjs"] as const
+const name = "mikro-orm"
+const base = `${name}.config`
+const configNameVariants = createConfigNameVariants(base, extnames)
 
 const withLoaders = (loader: Loader): Loaders =>
   Object.fromEntries(extnames.map(extname => [extname, loader]))
@@ -44,9 +43,9 @@ export async function loadConfig(
   const options = await loadCliOptions(rootFile)
   const loader = await createLoader(rootFile, options)
 
-  const result = await lilconfig("mikro-orm", {
-    searchPlaces: [...options.configPaths, ...searchPlaces],
-    loaders: withLoaders(loader.importModule)
+  const result = await lilconfig(name, {
+    searchPlaces: [...options.configPaths, ...configNameVariants],
+    loaders: withLoaders(loader.import)
   }).search(rootFile)
 
   if (!result) {

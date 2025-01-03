@@ -15,12 +15,16 @@ export const defaults: Required<CliOptions> = {
   configPaths: []
 }
 
+interface PackageSlice {
+  "mikro-orm"?: CliOptions
+}
+
 export async function loadCliOptions(
   pwd: string
 ): Promise<Required<CliOptions>> {
-  const pkg: Record<string, unknown> = JSON.parse(
+  const pkg: PackageSlice = JSON.parse(
     await readFile(join(pwd, "package.json"), "utf-8")
   )
 
-  return {...defaults, ...(pkg["mikro-orm"] as CliOptions)}
+  return {...defaults, ...pkg["mikro-orm"]}
 }

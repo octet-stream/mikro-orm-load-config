@@ -1,8 +1,8 @@
-import {resolve, join} from "node:path"
+import {join, resolve} from "node:path"
 
-import {describe, test, expect} from "vitest"
+import {describe, expect, test} from "vitest"
 
-import {loadConfig, LoadConfigError} from "./load-config.ts"
+import {LoadConfigError, loadConfig} from "./load-config.ts"
 
 const FIXTURES_ROOT = resolve(import.meta.dirname, "fixtures", "configs")
 
