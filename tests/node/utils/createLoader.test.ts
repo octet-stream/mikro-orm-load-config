@@ -2,9 +2,19 @@ import {join, resolve} from "node:path"
 
 import {describe, expect, test} from "vitest"
 
-import {type ConfigLoader, createLoader} from "./createLoader.ts"
+import {
+  type ConfigLoader,
+  createLoader
+} from "../../../src/utils/createLoader.ts"
+import type {LoaderOption} from "../../../src/utils/loadCliOptions.ts"
 
-const FIXTURES_ROOT = resolve(import.meta.dirname, "..", "fixtures", "loaders")
+const FIXTURES_ROOT = resolve(
+  import.meta.dirname,
+  "..",
+  "..",
+  "fixtures",
+  "loaders"
+)
 
 const createLoaderSuite = (name: string, loader: ConfigLoader) =>
   describe(name, () => {
@@ -15,7 +25,9 @@ const createLoaderSuite = (name: string, loader: ConfigLoader) =>
     }
     ;["ts", "mts", "cts", "js", "cjs", "mjs"].forEach(extname => {
       test(`loads ${extname} file`, async () => {
-        const expected = await import(`../fixtures/loaders/config.${extname}`)
+        const expected = await import(
+          `../../fixtures/loaders/config.${extname}`
+        )
         const actual = await loader.import(join(FIXTURES_ROOT, "config.ts"))
 
         expect(actual).toMatchObject(expected.default)
@@ -41,13 +53,15 @@ test("jiti", async () => {
 
 createLoaderSuite("tsx", await createLoader(FIXTURES_ROOT, {loader: "tsx"}))
 
-describe("disabled", () => {
-  test("loads js module using import()", async () => {
-    const expected = await import("../fixtures/loaders/config.js")
+describe("native", () => {
+  ;([false, "native"] satisfies LoaderOption[]).forEach(value => {
+    test(`when set to "${value}"`, async () => {
+      const expected = await import("../../fixtures/loaders/config.ts")
 
-    const loader = await createLoader(FIXTURES_ROOT, {loader: false})
-    const actual = await loader.import(join(FIXTURES_ROOT, "config.js"))
+      const loader = await createLoader(FIXTURES_ROOT, {loader: value})
+      const actual = await loader.import(join(FIXTURES_ROOT, "config.js"))
 
-    expect(actual).toMatchObject(expected.default)
+      expect(actual).toMatchObject(expected.default)
+    })
   })
 })

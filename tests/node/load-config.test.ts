@@ -2,14 +2,14 @@ import {join, resolve} from "node:path"
 
 import {describe, expect, test} from "vitest"
 
-import {LoadConfigError, loadConfig} from "./load-config.ts"
+import {LoadConfigError, loadConfig} from "../../src/load-config.ts"
 
-const FIXTURES_ROOT = resolve(import.meta.dirname, "fixtures", "configs")
+const FIXTURES_ROOT = resolve(import.meta.dirname, "..", "fixtures", "configs")
 
 describe("auto detect", () => {
   test("default search place", async () => {
     const expected = await import(
-      "./fixtures/configs/default-auto-detect/mikro-orm.config.ts"
+      "../fixtures/configs/default-auto-detect/mikro-orm.config.ts"
     )
 
     const actual = await loadConfig(join(FIXTURES_ROOT, "default-auto-detect"))
@@ -18,7 +18,7 @@ describe("auto detect", () => {
   })
 
   test("custom search place", async () => {
-    const expected = await import("./fixtures/configs/custom/config.ts")
+    const expected = await import("../fixtures/configs/custom/config.ts")
 
     const actual = await loadConfig(join(FIXTURES_ROOT, "custom"))
 
@@ -29,7 +29,7 @@ describe("auto detect", () => {
 test("Throws error if no config found", async () => {
   try {
     await loadConfig(
-      resolve(import.meta.dirname, "fixtures", "cli-options", "defaults")
+      resolve(import.meta.dirname, "..", "fixtures", "cli-options", "defaults")
     )
   } catch (error) {
     expect(error).toBeInstanceOf(LoadConfigError)

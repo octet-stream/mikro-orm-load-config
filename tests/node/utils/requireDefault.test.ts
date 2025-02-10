@@ -1,6 +1,6 @@
 import {expect, test} from "vitest"
 
-import {requireDefault} from "./requireDefault.ts"
+import {requireDefault} from "../../../src/utils/requireDefault.ts"
 
 test("return object with default property resolved", () => {
   const expected = "Some value"

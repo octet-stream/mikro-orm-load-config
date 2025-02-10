@@ -1,12 +1,14 @@
 import {readFile} from "node:fs/promises"
 import {join} from "node:path"
 
-export type ConfigLoader = "auto" | "jiti" | "tsx" | "native" | false
+export type LoaderName = "auto" | "jiti" | "tsx" | "native"
+
+export type LoaderOption = LoaderName | false | null
 
 export interface CliOptions {
   alwaysAllowTs?: boolean // I think it should be deprecated in favoir of loader option set to `false`
   configPaths?: string[]
-  loader?: ConfigLoader
+  loader?: LoaderOption
 }
 
 export const defaults: Required<CliOptions> = {

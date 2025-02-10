@@ -1,6 +1,6 @@
 import {expectTypeOf, test} from "vitest"
 
-import type {ToString} from "./ToString.ts"
+import type {ToString} from "../../../../src/utils/types/ToString.ts"
 
 test("cast number", () => {
   expectTypeOf<ToString<42>>().toEqualTypeOf<"42">()
