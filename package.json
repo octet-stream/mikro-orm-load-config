@@ -3,12 +3,14 @@
   "name": "mikro-orm-load-config",
   "version": "1.0.0",
   "description": "Mikro ORM improved load config proposal",
-  "main": "./lib/load-config.js",
-  "types": "./lib/load-config.d.ts",
   "exports": {
-    "types": "./lib/load-config.d.ts",
-    "module-sync": "./lib/load-config.js",
-    "default": "./lib/load-config.js"
+    ".": {
+      "types": "./lib/load-config.d.ts",
+      "module-sync": "./lib/load-config.js",
+      "import": "./lib/load-config.js",
+      "default": "./lib/load-config.js"
+    },
+    "./package.json": "./package.json"
   },
   "files": ["lib"],
   "scripts": {
