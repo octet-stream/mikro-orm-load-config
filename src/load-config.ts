@@ -2,17 +2,11 @@ import type {Options} from "@mikro-orm/core"
 import type {LilconfigResult, Loader, Loaders} from "lilconfig"
 import {lilconfig} from "lilconfig"
 
-import {concat} from "./utils/concat.ts"
 import {createConfigNameVariants} from "./utils/createConfigNameVariants.ts"
-import {createExtnameVariants} from "./utils/createExtnameVariants.ts"
 import {createLoader} from "./utils/createLoader.ts"
+import {extnames} from "./utils/extnames.ts"
 import {loadCliOptions} from "./utils/loadCliOptions.ts"
 import type {Replace} from "./utils/types/Replace.ts"
-
-const extnames = concat(
-  createExtnameVariants("ts", ["", "m", "c"]),
-  createExtnameVariants("js", ["", "m", "c"])
-)
 
 const name = "mikro-orm"
 const base = `${name}.config`

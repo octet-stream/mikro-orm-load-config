@@ -14,6 +14,8 @@ test("Resolves given import() promise", async () => {
 })
 
 test("Throws an ModuleImportError", async () => {
+  expect.hasAssertions()
+
   const expected = "Can't find a module"
   const expectedReason = {code: "ERR_MODULE_NOT_FOUND"}
 
@@ -31,6 +33,8 @@ test("Throws an ModuleImportError", async () => {
 })
 
 test("Rethrows unknown errors", async () => {
+  expect.hasAssertions()
+
   const expected = new Error("Some generic error")
 
   try {

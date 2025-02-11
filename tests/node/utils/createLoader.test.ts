@@ -6,7 +6,11 @@ import {
   type ConfigLoader,
   createLoader
 } from "../../../src/utils/createLoader.ts"
-import type {LoaderOption} from "../../../src/utils/loadCliOptions.ts"
+import {extnames} from "../../../src/utils/extnames.ts"
+import type {
+  LoaderName,
+  LoaderOption
+} from "../../../src/utils/loadCliOptions.ts"
 
 const FIXTURES_ROOT = resolve(
   import.meta.dirname,
@@ -16,18 +20,19 @@ const FIXTURES_ROOT = resolve(
   "loaders"
 )
 
-const createLoaderSuite = (name: string, loader: ConfigLoader) =>
+type SuiteName = Exclude<LoaderName, "native">
+
+const createLoaderSuite = (name: SuiteName, loader: ConfigLoader) =>
   describe(name, () => {
     if (name !== "auto") {
       test(`returns ${name} loader`, async () => {
         expect(loader.name).toBe(name)
       })
     }
-    ;["ts", "mts", "cts", "js", "cjs", "mjs"].forEach(extname => {
+
+    extnames.forEach(extname => {
       test(`loads ${extname} file`, async () => {
-        const expected = await import(
-          `../../fixtures/loaders/config.${extname}`
-        )
+        const expected = await import(join(FIXTURES_ROOT, `config${extname}`))
         const actual = await loader.import(join(FIXTURES_ROOT, "config.ts"))
 
         expect(actual).toMatchObject(expected.default)

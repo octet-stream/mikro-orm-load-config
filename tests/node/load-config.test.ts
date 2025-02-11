@@ -27,6 +27,8 @@ describe("auto detect", () => {
 })
 
 test("Throws error if no config found", async () => {
+  expect.hasAssertions()
+
   try {
     await loadConfig(
       resolve(import.meta.dirname, "..", "fixtures", "cli-options", "defaults")
