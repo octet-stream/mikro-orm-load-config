@@ -1,11 +1,11 @@
 import {expect, test} from "vitest"
 
-import {ModuleImportError, tryModule} from "../../../src/utils/tryModule.ts"
+import {ModuleNotFoundError, tryModule} from "../../../src/utils/tryModule.ts"
 
 test("Resolves given import() promise", async () => {
   const promise = import("../../fixtures/loaders/config.ts")
   const actual = await tryModule(promise, {
-    errorMessage: "This should not throw"
+    specifier: "../../fixtures/loaders/config.ts"
   })
 
   const expected = await promise
@@ -13,22 +13,26 @@ test("Resolves given import() promise", async () => {
   expect(actual).toEqual(expected)
 })
 
-test("Throws an ModuleImportError", async () => {
+test("Throws an ModuleNotFoundError", async () => {
   expect.hasAssertions()
 
-  const expected = "Can't find a module"
-  const expectedReason = {code: "ERR_MODULE_NOT_FOUND"}
+  class TestError extends Error implements NodeJS.ErrnoException {
+    code = "ERR_MODULE_NOT_FOUND"
+  }
+
+  const expected = "test.ts"
+  const expectedReason = new TestError("Test error message")
 
   try {
     await tryModule(Promise.reject(expectedReason), {
-      errorMessage: expected
+      specifier: expected
     })
   } catch (error) {
-    const actual = error as ModuleImportError
+    const actual = error as ModuleNotFoundError
 
-    expect(actual).toBeInstanceOf(ModuleImportError)
-    expect(actual.message).toBe(expected)
-    expect(actual.cause).toEqual(expectedReason)
+    expect(actual).toBeInstanceOf(ModuleNotFoundError)
+    expect(actual.message).toBe(`Unable to import module "${expected}"`)
+    expect(actual.cause).toBe(expectedReason)
   }
 })
 
@@ -39,7 +43,7 @@ test("Rethrows unknown errors", async () => {
 
   try {
     await tryModule(Promise.reject(expected), {
-      errorMessage: "This will not show up for unknown errors"
+      specifier: "unreachable.ts"
     })
   } catch (error) {
     expect(error).toBeInstanceOf(Error)
