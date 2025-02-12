@@ -28,6 +28,8 @@ export class ModuleUnknonwnExtensionError extends Error {
 }
 /* c8 ignore stop */
 
+export interface CreateLoaderOptions extends CliOptions {}
+
 export interface ConfigLoader {
   name: string
   import(id: string): Promise<Options>
@@ -37,35 +39,42 @@ export type CreateConfigLoader = (
   resolveFrom: string
 ) => ConfigLoader | Promise<ConfigLoader>
 
+type LoaderFactory = (
+  resolveFrom: string,
+  cliSettings: CreateLoaderOptions
+) => Promise<ConfigLoader>
+
+const createLoaderFactory = (fn: LoaderFactory): LoaderFactory => fn
+
 /**
  * Creates a loader for native [`import()`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/import) to import files
  */
-const createNativeLoader: CreateConfigLoader = (): ConfigLoader => ({
+const createNativeLoader = createLoaderFactory(async () => ({
   name: "native",
-  import: async id =>
-    import(id)
-      .then(result => requireDefault<Options>(result))
+  async import(id) {
+    try {
+      return requireDefault(await import(id))
+      // I have no idea how to test this with Vitest
       /* c8 ignore start */
-      .catch((error): never => {
-        if (
-          !isErrnoExpeption(error) ||
-          error.code !== "ERR_UNKNOWN_FILE_EXTENSION" ||
-          !isTsExtname(id)
-        ) {
-          throw error
-        }
+    } catch (error) {
+      if (
+        !isErrnoExpeption(error) ||
+        error.code !== "ERR_UNKNOWN_FILE_EXTENSION" ||
+        !isTsExtname(id)
+      ) {
+        throw error
+      }
 
-        throw new ModuleUnknonwnExtensionError(id, {cause: error})
-      })
-  /* c8 ignore stop */
-})
+      throw new ModuleUnknonwnExtensionError(id, {cause: error})
+    }
+    /* c8 ignore stop */
+  }
+}))
 
 /**
  * Creates a loader with [`jiti`](https://www.npmjs.com/package/jiti) as transpiler
  */
-const createJitiLoader: CreateConfigLoader = async (
-  resolveFrom: string
-): Promise<ConfigLoader> => {
+const createJitiLoader = createLoaderFactory(async resolveFrom => {
   const name = "jiti"
   const {createJiti} = await tryModule(import("jiti"), {
     specifier: name
@@ -77,12 +86,12 @@ const createJitiLoader: CreateConfigLoader = async (
     name,
     import: id => jiti.import(id, {default: true})
   }
-}
+})
 
 /**
  * Creates a loader with [`tsx`](https://www.npmjs.com/package/tsx) as transpiler
  */
-const createTsxLoader: CreateConfigLoader = async resolveFrom => {
+const createTsxLoader = createLoaderFactory(async resolveFrom => {
   const name = "tsx"
   const {tsImport} = await tryModule(import("tsx/esm/api"), {
     specifier: name
@@ -92,7 +101,7 @@ const createTsxLoader: CreateConfigLoader = async resolveFrom => {
     name,
     import: async id => requireDefault(await tsImport(id, resolveFrom))
   }
-}
+})
 
 const loaders = [createJitiLoader, createTsxLoader]
 
@@ -103,10 +112,10 @@ const loaders = [createJitiLoader, createTsxLoader]
  *
  * If no loader has been successfully created, it will return native loader and let the runtime to deal with config loading.
  */
-async function createAutoLoader(resolveFrom: string) {
+const createAutoLoader = createLoaderFactory(async (resolveFrom, options) => {
   for (const createLoader of loaders) {
     try {
-      return await createLoader(resolveFrom)
+      return await createLoader(resolveFrom, options)
       /* c8 ignore start */
     } catch (error) {
       if (!(error instanceof ModuleNotFoundError)) {
@@ -116,11 +125,9 @@ async function createAutoLoader(resolveFrom: string) {
   }
 
   // Fallback to the native `import()`
-  return createNativeLoader(resolveFrom)
-}
+  return createNativeLoader(resolveFrom, options)
+})
 /* c8 ignore stop */
-
-export interface CreateLoaderOptions extends CliOptions {}
 
 /**
  * Creates a loader depending on given `options.loader` value.
@@ -131,19 +138,23 @@ export async function createLoader(
   resolveFrom: string,
   options: CreateLoaderOptions = {}
 ): Promise<ConfigLoader> {
-  if (options.alwaysAllowTs) {
-    return createNativeLoader(resolveFrom)
+  if (
+    options.alwaysAllowTs ||
+    options.preferTs === false ||
+    options.useTsNode === false
+  ) {
+    return createNativeLoader(resolveFrom, options)
   }
 
   switch (options.loader) {
     case "jiti":
-      return createJitiLoader(resolveFrom)
+      return createJitiLoader(resolveFrom, options)
     case "tsx":
-      return createTsxLoader(resolveFrom)
+      return createTsxLoader(resolveFrom, options)
     case "native":
     case false:
-      return createNativeLoader(resolveFrom)
+      return createNativeLoader(resolveFrom, options)
     default:
-      return createAutoLoader(resolveFrom)
+      return createAutoLoader(resolveFrom, options)
   }
 }
