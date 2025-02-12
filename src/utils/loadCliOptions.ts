@@ -103,12 +103,15 @@ const castLoaderOption = createTypeCast((value): LoaderOption => {
   return value as LoaderOption
 })
 
-const cliOptionsFromEnv = (): CliOptions => ({
-  alwaysAllowTs: castBoolean(process.env.MIKRO_ORM_CLI_ALWAYS_ALLOW_TS),
-  useTsNode: castBoolean(process.env.MIKRO_ORM_CLI_USE_TS_NODE),
-  verbose: castBoolean(process.env.MIKRO_ORM_CLI_VERBOSE),
-  loader: castLoaderOption(process.env.MIKRO_ORM_CLI_LOADER)
-})
+const cliOptionsFromEnv = (): CliOptions =>
+  Object.fromEntries(
+    Object.entries({
+      alwaysAllowTs: castBoolean(process.env.MIKRO_ORM_CLI_ALWAYS_ALLOW_TS),
+      useTsNode: castBoolean(process.env.MIKRO_ORM_CLI_USE_TS_NODE),
+      verbose: castBoolean(process.env.MIKRO_ORM_CLI_VERBOSE),
+      loader: castLoaderOption(process.env.MIKRO_ORM_CLI_LOADER)
+    } satisfies CliOptions).filter(([, value]) => value != null) // filter out nullish values, so because object rest spread will not override non-null values from other objects
+  )
 
 type Defaults = RequiredSome<CliOptions, "loader" | "configPaths">
 
