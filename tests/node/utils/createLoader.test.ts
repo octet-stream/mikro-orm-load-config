@@ -38,6 +38,13 @@ const createLoaderSuite = (name: SuiteName, loader: ConfigLoader) =>
         expect(actual).toMatchObject(expected.default)
       })
     })
+
+    test("resolves Promise exported from a module", async () => {
+      const expected = await import("../../fixtures/loaders/promise.ts")
+      const actual = await loader.import(join(FIXTURES_ROOT, "promise.ts"))
+
+      expect(actual).toEqual(await expected.default)
+    })
   })
 
 describe("auto detect", async () => {
