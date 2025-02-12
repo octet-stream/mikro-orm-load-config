@@ -1,5 +1,8 @@
-import {readFile} from "node:fs/promises"
 import {join} from "node:path"
+
+import {requireDefault} from "./requireDefault.ts"
+import type {RequiredSome} from "./types/RequiredSome.ts"
+import type {Simplify} from "./types/Simplify.ts"
 
 export type LoaderName = "auto" | "jiti" | "tsx" | "native"
 
@@ -11,9 +14,10 @@ export interface CliOptions {
   loader?: LoaderOption
 }
 
-export const defaults: Required<CliOptions> = {
+type Defaults = RequiredSome<CliOptions, "loader" | "configPaths">
+
+export const defaults: Defaults = {
   loader: "auto",
-  alwaysAllowTs: true,
   configPaths: []
 }
 
@@ -22,10 +26,10 @@ interface PackageSlice {
 }
 
 export async function loadCliOptions(
-  projectRootFolder: string
-): Promise<Required<CliOptions>> {
-  const pkg: PackageSlice = JSON.parse(
-    await readFile(join(projectRootFolder, "package.json"), "utf-8")
+  searchFrom: string
+): Promise<Simplify<CliOptions & Defaults>> {
+  const pkg = requireDefault<PackageSlice>(
+    await import(join(searchFrom, "package.json"), {with: {type: "json"}})
   )
 
   return {...defaults, ...pkg["mikro-orm"]}

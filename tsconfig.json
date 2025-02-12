@@ -9,6 +9,7 @@
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
     "noUncheckedIndexedAccess": true,
-    "allowImportingTsExtensions": true
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true
   }
 }
