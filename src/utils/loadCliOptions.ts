@@ -110,7 +110,7 @@ const cliOptionsFromEnv = (): CliOptions =>
       useTsNode: castBoolean(process.env.MIKRO_ORM_CLI_USE_TS_NODE),
       verbose: castBoolean(process.env.MIKRO_ORM_CLI_VERBOSE),
       loader: castLoaderOption(process.env.MIKRO_ORM_CLI_LOADER)
-    } satisfies CliOptions).filter(([, value]) => value != null) // filter out nullish values, so because object rest spread will not override non-null values from other objects
+    } satisfies CliOptions).filter(([, value]) => value != null) // filter out nullish values, so that object rest spread will not override non-null values from other objects
   )
 
 type Defaults = RequiredSome<CliOptions, "loader" | "configPaths">

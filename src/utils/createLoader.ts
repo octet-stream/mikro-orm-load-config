@@ -10,7 +10,6 @@ export interface ModuleUnknonwnExtensionErrorOptions extends ErrorOptions {
   cause: NodeJS.ErrnoException
 }
 
-/* c8 ignore start */
 export class ModuleUnknonwnExtensionError extends Error {
   readonly cause: NodeJS.ErrnoException
 
@@ -18,7 +17,7 @@ export class ModuleUnknonwnExtensionError extends Error {
     const {cause, ...rest} = options
 
     super(
-      `Unable to import "${specifier}" module.\nYou need to install either "ts-node", "jiti", or "tsx" to import TypeScript modules.`,
+      `Unable to import "${specifier}" module.\nYou need to install either "jiti" or "tsx" to import TypeScript modules.`,
 
       rest
     )
@@ -26,7 +25,6 @@ export class ModuleUnknonwnExtensionError extends Error {
     this.cause = cause
   }
 }
-/* c8 ignore stop */
 
 export interface CreateLoaderOptions extends CliOptions {}
 
@@ -54,8 +52,6 @@ const createNativeLoader = createLoaderFactory(async () => ({
   async import(id) {
     try {
       return requireDefault(await import(id))
-      // I have no idea how to test this with Vitest
-      /* c8 ignore start */
     } catch (error) {
       if (
         !isErrnoExpeption(error) ||
@@ -67,7 +63,6 @@ const createNativeLoader = createLoaderFactory(async () => ({
 
       throw new ModuleUnknonwnExtensionError(id, {cause: error})
     }
-    /* c8 ignore stop */
   }
 }))
 
