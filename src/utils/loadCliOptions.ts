@@ -93,7 +93,7 @@ const castBoolean = createTypeCast(value => truthy.includes(value))
 
 const castLoaderOption = createTypeCast((value): LoaderOption => {
   if (truthy.includes(value)) {
-    return "auto"
+    return "auto" // This option should override value from package.json, so we return auto
   }
 
   if (falsy.includes(value)) {
@@ -109,7 +109,8 @@ const cliOptionsFromEnv = (): CliOptions =>
       alwaysAllowTs: castBoolean(process.env.MIKRO_ORM_CLI_ALWAYS_ALLOW_TS),
       useTsNode: castBoolean(process.env.MIKRO_ORM_CLI_USE_TS_NODE),
       verbose: castBoolean(process.env.MIKRO_ORM_CLI_VERBOSE),
-      loader: castLoaderOption(process.env.MIKRO_ORM_CLI_LOADER)
+      loader: castLoaderOption(process.env.MIKRO_ORM_CLI_LOADER),
+      tsConfigPath: process.env.MIKRO_ORM_CLI_TS_CONFIG_PATH
     } satisfies CliOptions).filter(([, value]) => value != null) // filter out nullish values, so that object rest spread will not override non-null values from other objects
   )
 
