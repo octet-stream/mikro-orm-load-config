@@ -1,12 +1,13 @@
 import {isAbsolute, join, resolve} from "node:path"
-import type {Options} from "@mikro-orm/core"
+import type {Configuration} from "@mikro-orm/core"
 import type {LilconfigResult, Loader, Loaders} from "lilconfig"
 import {lilconfig} from "lilconfig"
 
 import {createConfigNameVariants} from "./utils/createConfigNameVariants.ts"
-import {createLoader} from "./utils/createLoader.ts"
 import {extnames} from "./utils/extnames.ts"
 import {loadCliOptions} from "./utils/loadCliOptions.ts"
+import {createLoader} from "./utils/loaders.ts"
+import {resolveConfig} from "./utils/resolveConfig.ts"
 import type {Replace} from "./utils/types/Replace.ts"
 
 const name = "mikro-orm"
@@ -34,7 +35,7 @@ const withLoaders = (loader: Loader): Loaders =>
 export type LoadConfigResult = Replace<
   NonNullable<LilconfigResult>,
   {
-    config: Options
+    config: Configuration
   }
 > & {loader: string}
 
@@ -44,12 +45,28 @@ export class LoadConfigError extends Error {
   }
 }
 
+export interface LoadConfigParams {
+  /**
+   * A directory to search config at. Defaults to `process.cwd()`
+   */
+  searchFrom?: string
+
+  /**
+   * Name of config to load out of the ORM configuration file. Used when config file exports an array or a function
+   */
+  contextName?: string
+}
+
 /**
- * Loads Mikro ORM config
+ * Loads Mikro ORM config at given `searchFrom` directory
+ *
+ * @param searchFrom - A directory to search config at. Defaults to `process.cwd()`
+ * @param contextName - Name of config to load out of the ORM configuration file. Used when config file exports an array or a function
  */
-export async function loadConfig(
-  searchFrom = process.cwd()
-): Promise<LoadConfigResult> {
+export async function loadConfig({
+  searchFrom = process.cwd(),
+  contextName
+}: LoadConfigParams = {}): Promise<LoadConfigResult> {
   if (!isAbsolute(searchFrom)) {
     searchFrom = resolve(searchFrom)
   }
@@ -68,5 +85,11 @@ export async function loadConfig(
     throw new LoadConfigError(searchFrom)
   }
 
-  return {...result, loader: loader.name}
+  const config = await resolveConfig(
+    result.config,
+    result.filepath,
+    contextName
+  )
+
+  return {...result, config, loader: loader.name}
 }

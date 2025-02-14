@@ -12,24 +12,26 @@ describe("auto detect", () => {
       "../fixtures/configs/default-auto-detect/mikro-orm.config.ts"
     )
 
-    const actual = await loadConfig(join(FIXTURES_ROOT, "default-auto-detect"))
+    const actual = await loadConfig({
+      searchFrom: join(FIXTURES_ROOT, "default-auto-detect")
+    })
 
-    expect(actual.config).toEqual(expected.default)
+    expect(actual.config.getAll()).toMatchObject(expected.default)
   })
 
   test("custom search place", async () => {
     const expected = await import("../fixtures/configs/custom/config.ts")
-    const actual = await loadConfig(join(FIXTURES_ROOT, "custom"))
+    const actual = await loadConfig({searchFrom: join(FIXTURES_ROOT, "custom")})
 
-    expect(actual.config).toEqual(expected.default)
+    expect(actual.config.getAll()).toMatchObject(expected.default)
   })
 })
 
 test("supports relative paths", async () => {
   const expected = await import("../fixtures/configs/custom/config.ts")
-  const actual = await loadConfig("tests/fixtures/configs/custom")
+  const actual = await loadConfig({searchFrom: "tests/fixtures/configs/custom"})
 
-  expect(actual.config).toEqual(expected.default)
+  expect(actual.config.getAll()).toMatchObject(expected.default)
 })
 
 test("reads config using specified loader", async () => {
@@ -41,7 +43,7 @@ test("reads config using specified loader", async () => {
     }
   )
 
-  const actual = await loadConfig("tests/fixtures/configs/tsx")
+  const actual = await loadConfig({searchFrom: "tests/fixtures/configs/tsx"})
 
   expect(actual.loader).toBe(expected["mikro-orm"].loader)
 })
@@ -50,9 +52,15 @@ test("Throws error if no config found", async () => {
   expect.hasAssertions()
 
   try {
-    await loadConfig(
-      resolve(import.meta.dirname, "..", "fixtures", "cli-options", "defaults")
-    )
+    await loadConfig({
+      searchFrom: resolve(
+        import.meta.dirname,
+        "..",
+        "fixtures",
+        "cli-options",
+        "defaults"
+      )
+    })
   } catch (error) {
     expect(error).toBeInstanceOf(LoadConfigError)
   }

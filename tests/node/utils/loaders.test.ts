@@ -2,17 +2,17 @@ import {join, resolve} from "node:path"
 
 import {describe, expect, test} from "vitest"
 
-import {
-  type ConfigLoader,
-  type CreateLoaderOptions,
-  ModuleUnknonwnExtensionError,
-  createLoader
-} from "../../../src/utils/createLoader.ts"
 import {extnames} from "../../../src/utils/extnames.ts"
 import type {
   LoaderName,
   LoaderOption
 } from "../../../src/utils/loadCliOptions.ts"
+import {
+  type ConfigLoader,
+  type CreateLoaderOptions,
+  ModuleUnknonwnExtensionError,
+  createLoader
+} from "../../../src/utils/loaders.ts"
 
 const FIXTURES_ROOT = resolve(
   import.meta.dirname,
@@ -114,7 +114,7 @@ describe("native", () => {
   })
 
   test("loads a .js file", async () => {
-    const expected = await import("../../fixtures/loaders/config.js")
+    const expected = await import("../../fixtures/loaders/config.ts")
 
     const loader = await createLoader(FIXTURES_ROOT, {loader: "native"})
     const actual = await loader.import(join(FIXTURES_ROOT, "config.js"))
@@ -123,7 +123,7 @@ describe("native", () => {
   })
 
   test("resolves promise exposed from module", async () => {
-    const expected = await import("../../fixtures/loaders/promise.js")
+    const expected = await import("../../fixtures/loaders/promise.ts")
 
     const loader = await createLoader(FIXTURES_ROOT, {loader: "native"})
     const actual = await loader.import(join(FIXTURES_ROOT, "promise.js"))

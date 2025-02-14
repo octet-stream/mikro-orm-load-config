@@ -28,9 +28,40 @@ export class ModuleUnknonwnExtensionError extends Error {
 
 export interface CreateLoaderOptions extends CliOptions {}
 
+export interface ConfigFactory {
+  /**
+   * A function that returns raw configuration object
+   *
+   * @param contextName - The name of the config passed via `--context` flag
+   */
+  (contextName: string): Promise<Options>
+}
+
+/**
+ * Raw configuration data returned upon `loader.import(specifier)` call
+ */
+export type ImportConfigResult =
+  | ConfigFactory
+  | Options
+  | Array<Options | ConfigFactory>
+
+/**
+ * Configuration loader object
+ */
 export interface ConfigLoader {
+  /**
+   * The unique name of the loader
+   */
   name: string
-  import(id: string): Promise<Options>
+
+  /**
+   * Configuration module import implementation.
+   *
+   * Returns raw config data
+   *
+   * @param specifier - A module path to import
+   */
+  import(specifier: string): Promise<ImportConfigResult>
 }
 
 export type CreateConfigLoader = (

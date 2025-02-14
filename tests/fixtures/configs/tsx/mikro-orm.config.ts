@@ -1,1 +1,1 @@
-export * from "../default-auto-detect/mikro-orm.config.ts"
+export {default} from "../default-auto-detect/mikro-orm.config.ts"
