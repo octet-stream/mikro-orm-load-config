@@ -1,12 +1,12 @@
 import {isAbsolute, join, resolve} from "node:path"
-import type {Configuration} from "@mikro-orm/core"
-import type {LilconfigResult, Loader, Loaders} from "lilconfig"
+import type {Configuration, Options} from "@mikro-orm/core"
+import type {LilconfigResult, Loaders} from "lilconfig"
 import {lilconfig} from "lilconfig"
 
 import {createConfigNameVariants} from "./utils/createConfigNameVariants.ts"
 import {extnames} from "./utils/extnames.ts"
 import {loadCliOptions} from "./utils/loadCliOptions.ts"
-import {createLoader} from "./utils/loaders.ts"
+import {type ModuleLoader, createLoader} from "./utils/loaders.ts"
 import {resolveConfig} from "./utils/resolveConfig.ts"
 import type {Replace} from "./utils/types/Replace.ts"
 
@@ -29,8 +29,12 @@ const defaultSearchPlaces = [
   ...extraVariants
 ]
 
-const withLoaders = (loader: Loader): Loaders =>
-  Object.fromEntries(extnames.map(extname => [extname, loader]))
+function createConfigLoaders(loader: ModuleLoader): Loaders {
+  const configLoader = (specifier: string) =>
+    loader.import<Options>(specifier, {default: true})
+
+  return Object.fromEntries(extnames.map(extname => [extname, configLoader]))
+}
 
 export type LoadConfigResult = Replace<
   NonNullable<LilconfigResult>,
@@ -71,7 +75,7 @@ export async function loadConfig({
   const options = await loadCliOptions(searchFrom)
   const loader = await createLoader(searchFrom, options)
   const searchPlaces = [...options.configPaths, ...defaultSearchPlaces]
-  const loaders = withLoaders(loader.import)
+  const loaders = createConfigLoaders(loader)
 
   const result = await lilconfig(name, {
     searchPlaces,

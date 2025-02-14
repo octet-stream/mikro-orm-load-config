@@ -10,8 +10,8 @@ import type {
 } from "../../../src/utils/loadCliOptions.ts"
 import {createLoader} from "../../../src/utils/loaders.ts"
 import type {
-  ConfigLoader,
-  CreateLoaderOptions
+  CreateLoaderOptions,
+  ModuleLoader
 } from "../../../src/utils/loaders.ts"
 
 const FIXTURES_ROOT = resolve(
@@ -24,7 +24,7 @@ const FIXTURES_ROOT = resolve(
 
 type SuiteName = Exclude<LoaderName, "native">
 
-const createLoaderSuite = (name: SuiteName, loader: ConfigLoader) =>
+const createLoaderSuite = (name: SuiteName, loader: ModuleLoader) =>
   describe(name, () => {
     if (name !== "auto") {
       test(`returns ${name} loader`, async () => {

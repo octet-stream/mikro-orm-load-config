@@ -1,5 +1,3 @@
-import type {Options} from "@mikro-orm/core"
-
 import {ModuleNotFoundError} from "../errors/ModuleNotFoundError.ts"
 import {ModuleUnknonwnExtensionError} from "../errors/ModuleUnknonwnExtensionError.ts"
 
@@ -11,27 +9,14 @@ import {tryModule} from "./tryModule.ts"
 
 export interface CreateLoaderOptions extends CliOptions {}
 
-export interface ConfigFactory {
-  /**
-   * A function that returns raw configuration object
-   *
-   * @param contextName - The name of the config passed via `--context` flag
-   */
-  (contextName: string): Promise<Options>
+interface LoaderImportOptions {
+  default?: boolean
 }
-
-/**
- * Raw configuration data returned upon `loader.import(specifier)` call
- */
-export type ImportConfigResult =
-  | ConfigFactory
-  | Options
-  | Array<Options | ConfigFactory>
 
 /**
  * Configuration loader object
  */
-export interface ConfigLoader {
+export interface ModuleLoader {
   /**
    * The unique name of the loader
    */
@@ -44,17 +29,16 @@ export interface ConfigLoader {
    *
    * @param specifier - A module path to import
    */
-  import(specifier: string): Promise<ImportConfigResult>
+  import<TExports extends Record<string, unknown>>(
+    specifier: string,
+    options?: LoaderImportOptions
+  ): Promise<TExports>
 }
-
-export type CreateConfigLoader = (
-  resolveFrom: string
-) => ConfigLoader | Promise<ConfigLoader>
 
 type LoaderFactory = (
   resolveFrom: string,
   cliSettings: CreateLoaderOptions
-) => Promise<ConfigLoader>
+) => Promise<ModuleLoader>
 
 const createLoaderFactory = (fn: LoaderFactory): LoaderFactory => fn
 
@@ -146,7 +130,7 @@ const createAutoLoader = createLoaderFactory(async (resolveFrom, options) => {
 export async function createLoader(
   resolveFrom: string,
   options: CreateLoaderOptions = {}
-): Promise<ConfigLoader> {
+): Promise<ModuleLoader> {
   if (
     options.alwaysAllowTs ||
     options.preferTs === false ||

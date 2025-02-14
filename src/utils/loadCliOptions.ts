@@ -1,5 +1,7 @@
 import {join} from "node:path"
 
+import {packageUp} from "package-up"
+
 import {requireDefault} from "./requireDefault.ts"
 import type {RequiredSome} from "./types/RequiredSome.ts"
 import type {Simplify} from "./types/Simplify.ts"
@@ -128,8 +130,16 @@ interface PackageSlice {
 export async function loadCliOptions(
   searchFrom: string
 ): Promise<Simplify<CliOptions & Defaults>> {
+  const path = await packageUp({cwd: searchFrom})
+
+  if (!path) {
+    throw Error(
+      `Unable to find 'package.json' file at ${searchFrom} or its parent directories`
+    )
+  }
+
   const pkg = requireDefault<PackageSlice>(
-    await import(join(searchFrom, "package.json"), {with: {type: "json"}})
+    await import(path, {with: {type: "json"}})
   )
 
   return {...defaults, ...pkg["mikro-orm"], ...cliOptionsFromEnv()}

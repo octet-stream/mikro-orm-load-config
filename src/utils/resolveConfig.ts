@@ -3,7 +3,23 @@ import {Configuration, type Options} from "@mikro-orm/core"
 import {ResolveConfigError} from "../errors/ResolveConfigError.ts"
 
 import {isObject} from "./isObject.ts"
-import type {ConfigFactory, ImportConfigResult} from "./loaders.ts"
+
+export interface ConfigFactory {
+  /**
+   * A function that returns raw configuration object
+   *
+   * @param contextName - The name of the config passed via `--context` flag
+   */
+  (contextName: string): Promise<Options>
+}
+
+/**
+ * Raw configuration data returned upon `loader.import(specifier)` call
+ */
+export type ImportConfigResult =
+  | ConfigFactory
+  | Options
+  | Array<Options | ConfigFactory>
 
 const isValidConfigFactoryResult = (
   config: unknown,
