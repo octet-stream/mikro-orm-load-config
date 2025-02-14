@@ -1,30 +1,13 @@
 import type {Options} from "@mikro-orm/core"
 
+import {ModuleNotFoundError} from "../errors/ModuleNotFoundError.ts"
+import {ModuleUnknonwnExtensionError} from "../errors/ModuleUnknonwnExtensionError.ts"
+
 import {isErrnoExpeption} from "./isErrnoException.ts"
 import {isTsExtname} from "./isTsExtname.ts"
 import type {CliOptions} from "./loadCliOptions.ts"
 import {requireDefault} from "./requireDefault.ts"
-import {ModuleNotFoundError, tryModule} from "./tryModule.ts"
-
-export interface ModuleUnknonwnExtensionErrorOptions extends ErrorOptions {
-  cause: NodeJS.ErrnoException
-}
-
-export class ModuleUnknonwnExtensionError extends Error {
-  readonly cause: NodeJS.ErrnoException
-
-  constructor(specifier: string, options: ModuleUnknonwnExtensionErrorOptions) {
-    const {cause, ...rest} = options
-
-    super(
-      `Unable to import "${specifier}" module.\nYou need to install either "jiti" or "tsx" to import TypeScript modules.`,
-
-      rest
-    )
-
-    this.cause = cause
-  }
-}
+import {tryModule} from "./tryModule.ts"
 
 export interface CreateLoaderOptions extends CliOptions {}
 

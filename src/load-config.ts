@@ -59,9 +59,6 @@ export interface LoadConfigParams {
 
 /**
  * Loads Mikro ORM config at given `searchFrom` directory
- *
- * @param searchFrom - A directory to search config at. Defaults to `process.cwd()`
- * @param contextName - Name of config to load out of the ORM configuration file. Used when config file exports an array or a function
  */
 export async function loadConfig({
   searchFrom = process.cwd(),

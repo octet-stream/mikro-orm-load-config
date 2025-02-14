@@ -2,12 +2,11 @@ import {join, resolve} from "node:path"
 
 import {afterEach, describe, expect, test} from "vitest"
 
-import {
-  type CliOptions,
-  type LoaderName,
-  type LoaderOption,
-  defaults,
-  loadCliOptions
+import {defaults, loadCliOptions} from "../../../src/utils/loadCliOptions.ts"
+import type {
+  CliOptions,
+  LoaderName,
+  LoaderOption
 } from "../../../src/utils/loadCliOptions.ts"
 
 const FIXTURES_ROOT = resolve(

@@ -8,11 +8,9 @@ import {
   defineConfig
 } from "@mikro-orm/better-sqlite"
 
+import {ResolveConfigError} from "../../../src/errors/ResolveConfigError.ts"
 import type {ConfigFactory} from "../../../src/utils/loaders.ts"
-import {
-  ResolveConfigError,
-  resolveConfig
-} from "../../../src/utils/resolveConfig.ts"
+import {resolveConfig} from "../../../src/utils/resolveConfig.ts"
 
 @Entity()
 class BlankEntity {

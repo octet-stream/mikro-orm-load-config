@@ -2,16 +2,16 @@ import {join, resolve} from "node:path"
 
 import {describe, expect, test} from "vitest"
 
+import {ModuleUnknonwnExtensionError} from "../../../src/errors/ModuleUnknonwnExtensionError.ts"
 import {extnames} from "../../../src/utils/extnames.ts"
 import type {
   LoaderName,
   LoaderOption
 } from "../../../src/utils/loadCliOptions.ts"
-import {
-  type ConfigLoader,
-  type CreateLoaderOptions,
-  ModuleUnknonwnExtensionError,
-  createLoader
+import {createLoader} from "../../../src/utils/loaders.ts"
+import type {
+  ConfigLoader,
+  CreateLoaderOptions
 } from "../../../src/utils/loaders.ts"
 
 const FIXTURES_ROOT = resolve(

@@ -1,6 +1,7 @@
 import {expect, test} from "vitest"
 
-import {ModuleNotFoundError, tryModule} from "../../../src/utils/tryModule.ts"
+import {ModuleNotFoundError} from "../../../src/errors/ModuleNotFoundError.ts"
+import {tryModule} from "../../../src/utils/tryModule.ts"
 
 test("Resolves given import() promise", async () => {
   const promise = import("../../fixtures/loaders/config.ts")

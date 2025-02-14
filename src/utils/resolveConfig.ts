@@ -1,9 +1,9 @@
 import {Configuration, type Options} from "@mikro-orm/core"
 
+import {ResolveConfigError} from "../errors/ResolveConfigError.ts"
+
 import {isObject} from "./isObject.ts"
 import type {ConfigFactory, ImportConfigResult} from "./loaders.ts"
-
-export class ResolveConfigError extends Error {}
 
 const isValidConfigFactoryResult = (
   config: unknown,
@@ -70,7 +70,7 @@ async function configFromArray(
  *
  * @param config - Raw config data
  * @param path - Path to the config
- * @param contextName - Name of the config
+ * @param contextName - Name of config to load out of the ORM configuration file. Used when config file exports an array or a function
  */
 export async function resolveConfig(
   config: ImportConfigResult,
