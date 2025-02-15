@@ -3,6 +3,21 @@ import {glob} from "tinyglobby"
 
 import {type LoaderOption, loadCliOptions} from "./utils/loadCliOptions.ts"
 import {createLoader} from "./utils/loaders.ts"
+import type {NonEmptyArray} from "./utils/types/NonEmptyArray.ts"
+
+function isPatternsParamValid(
+  patterns: string | NonEmptyArray<string>
+): boolean {
+  if (typeof patterns === "string" && !!patterns) {
+    return true
+  }
+
+  if (Array.isArray(patterns)) {
+    return patterns.some(pattern => typeof pattern === "string" && !!pattern)
+  }
+
+  return false
+}
 
 export interface GlobDiscoveryOptions {
   cwd?: string
@@ -25,14 +40,18 @@ export interface CreateGlobDiscovery {
    *
    * @param patterns - An array of glob patterns to search for. Defaults to `['**\/*.{ts,mts}']`
    */
-  (patterns?: string | string[], options?: GlobDiscoveryOptions): GlobDiscovery
+  (
+    patterns: string | NonEmptyArray<string>,
+    options?: GlobDiscoveryOptions
+  ): GlobDiscovery
 }
 
-const createGlobDiscovery: CreateGlobDiscovery = (
-  patterns = [],
-  options = {}
-) =>
-  async function* globDiscovery(
+const createGlobDiscovery: CreateGlobDiscovery = (patterns, options = {}) => {
+  if (!isPatternsParamValid(patterns)) {
+    throw new Error("You shold provide at least one search pattern")
+  }
+
+  return async function* discovery(
     config: Configuration
   ): AsyncGenerator<GlobDiscoveryResult> {
     const cwd = options.cwd || config.get("baseDir") || process.cwd()
@@ -44,18 +63,13 @@ const createGlobDiscovery: CreateGlobDiscovery = (
 
     const loader = await createLoader(cwd, cliOptions)
 
-    let input = Array.isArray(patterns) ? patterns.slice() : [patterns]
-
-    if (input.length === 0) {
-      input = ["**/*.{ts,mst,js,mjs}"]
-    }
-
-    const paths = await glob(input, {...options, cwd, absolute: true})
+    const paths = await glob(patterns, {...options, cwd, absolute: true})
     for (const path of paths) {
       const exports = await loader.import(path)
 
       yield {path, exports}
     }
   }
+}
 
 export const discoverEntities = createGlobDiscovery
