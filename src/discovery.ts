@@ -25,10 +25,13 @@ export interface CreateGlobDiscovery {
    *
    * @param patterns - An array of glob patterns to search for. Defaults to `['**\/*.{ts,mts}']`
    */
-  (patterns: string | string[], options?: GlobDiscoveryOptions): GlobDiscovery
+  (patterns?: string | string[], options?: GlobDiscoveryOptions): GlobDiscovery
 }
 
-const createGlobDiscovery: CreateGlobDiscovery = (patterns, options = {}) =>
+const createGlobDiscovery: CreateGlobDiscovery = (
+  patterns = [],
+  options = {}
+) =>
   async function* globDiscovery(
     config: Configuration
   ): AsyncGenerator<GlobDiscoveryResult> {
