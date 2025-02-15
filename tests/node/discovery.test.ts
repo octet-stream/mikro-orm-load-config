@@ -1,6 +1,7 @@
 import {resolve} from "node:path"
 
 import {Configuration} from "@mikro-orm/core"
+import {glob} from "tinyglobby"
 import {describe, expect, test} from "vitest"
 
 import {discoverEntities} from "../../src/discovery.ts"
@@ -20,20 +21,57 @@ describe("discoverEntities", () => {
   })
 
   test("yields files matching given pattern", async () => {
-    const discover = discoverEntities([], {
-      cwd: resolve(import.meta.dirname, "..", "fixtures", "entities"),
+    const pattern = "**/*.ts"
+    const cwd = resolve(import.meta.dirname, "..", "fixtures", "entities")
+
+    const expectedPaths = await glob(pattern, {cwd, absolute: true})
+    const discover = discoverEntities(pattern, {
+      cwd,
       loader: "tsx" // jiti breaks on class properties without initializer: https://github.com/unjs/jiti/issues/57
     })
 
-    const [actual] = await Array.fromAsync(
+    const modules = await Array.fromAsync(
       discover(new Configuration({}, false))
     )
 
-    expect(actual?.path).toBe(
-      resolve(import.meta.dirname, "..", "fixtures", "entities", "User.ts")
+    expect(modules.map(({path}) => path)).toEqual(expectedPaths)
+
+    expect(modules[0]?.exports).toHaveProperty("User")
+    expect(typeof modules[0]?.exports.User).toBe("function")
+  })
+
+  test("accepts array as the 1st argument", async () => {
+    const pattern = "**/*.ts"
+    const cwd = resolve(import.meta.dirname, "..", "fixtures", "entities")
+
+    const expectedPaths = await glob([pattern], {cwd, absolute: true})
+    const discover = discoverEntities([pattern], {
+      cwd,
+      loader: "tsx" // jiti breaks on class properties without initializer: https://github.com/unjs/jiti/issues/57
+    })
+
+    const modules = await Array.fromAsync(
+      discover(new Configuration({}, false))
     )
 
-    expect(actual?.exports).toHaveProperty("User")
-    expect(typeof actual?.exports.User).toBe("function")
+    expect(modules.map(({path}) => path)).toEqual(expectedPaths)
+  })
+
+  test("falls back to default pattern when called with empty array", async () => {
+    const pattern = "**/*.ts"
+    const cwd = resolve(import.meta.dirname, "..", "fixtures", "entities")
+
+    const expectedPaths = await glob(pattern, {cwd, absolute: true})
+
+    const discover = discoverEntities([], {
+      cwd,
+      loader: "tsx" // jiti breaks on class properties without initializer: https://github.com/unjs/jiti/issues/57
+    })
+
+    const modules = await Array.fromAsync(
+      discover(new Configuration({}, false))
+    )
+
+    expect(modules.map(({path}) => path)).toEqual(expectedPaths)
   })
 })

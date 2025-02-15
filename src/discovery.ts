@@ -23,7 +23,7 @@ export interface CreateGlobDiscovery {
   /**
    * Takes `patterns` and returns glob discovery iterator that yields modules exports for matched files
    *
-   * @param patterns - An array of glob patterns to search for. Defaults to ['**\/*.{ts,mts}']
+   * @param patterns - An array of glob patterns to search for. Defaults to `['**\/*.{ts,mts}']`
    */
   (patterns: string | string[], options?: GlobDiscoveryOptions): GlobDiscovery
 }
