@@ -40,7 +40,7 @@ const discovery = discoverEntities("**/*.ts", {
 // The result can be consumed via `for-await-of` iterator, or transformed into Array using `Array.fromAsync` method
 const entries = await Array.fromAsync(discovery(new Configuration({}, false)))
 
-console.log(entries)
+console.log(entries) // -> {path: string, exports: Record<string, unknown>}
 ```
 
 The `discovery` function expects `Configuration` object as first argument, so we can rely on existent Mikro ORM config.
