@@ -1,8 +1,6 @@
-import {join} from "node:path"
-
 import {packageUp} from "package-up"
 
-import {requireDefault} from "./requireDefault.ts"
+import {resolveDefaultExport} from "./resolveDefaultExport.ts"
 import type {RequiredSome} from "./types/RequiredSome.ts"
 import type {Simplify} from "./types/Simplify.ts"
 
@@ -127,6 +125,10 @@ interface PackageSlice {
   "mikro-orm"?: CliOptions
 }
 
+interface PackageModule {
+  default: PackageSlice
+}
+
 export async function loadCliOptions(
   searchFrom: string
 ): Promise<Simplify<CliOptions & Defaults>> {
@@ -138,8 +140,10 @@ export async function loadCliOptions(
     )
   }
 
-  const pkg = requireDefault<PackageSlice>(
-    await import(path, {with: {type: "json"}})
+  const pkg = resolveDefaultExport(
+    (await import(path, {with: {type: "json"}})) as PackageModule,
+
+    true
   )
 
   return {...defaults, ...pkg["mikro-orm"], ...cliOptionsFromEnv()}

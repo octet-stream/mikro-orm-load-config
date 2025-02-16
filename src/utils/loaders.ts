@@ -4,7 +4,7 @@ import {ModuleUnknonwnExtensionError} from "../errors/ModuleUnknonwnExtensionErr
 import {isErrnoExpeption} from "./isErrnoException.ts"
 import {isTsExtname} from "./isTsExtname.ts"
 import type {CliOptions} from "./loadCliOptions.ts"
-import {requireDefault} from "./requireDefault.ts"
+import {resolveDefaultExport} from "./resolveDefaultExport.ts"
 import {tryModule} from "./tryModule.ts"
 
 export interface CreateLoaderOptions extends CliOptions {}
@@ -47,9 +47,9 @@ const createLoaderFactory = (fn: LoaderFactory): LoaderFactory => fn
  */
 const createNativeLoader = createLoaderFactory(async () => ({
   name: "native",
-  async import(id) {
+  async import(id, options) {
     try {
-      return requireDefault(await import(id))
+      return resolveDefaultExport(await import(id), options?.default)
     } catch (error) {
       if (
         !isErrnoExpeption(error) ||
@@ -77,7 +77,8 @@ const createJitiLoader = createLoaderFactory(async resolveFrom => {
 
   return {
     name,
-    import: id => jiti.import(id, {default: true})
+    import: (id, options) =>
+      jiti.import(id, options?.default ? {default: true} : undefined)
   }
 })
 
@@ -92,7 +93,8 @@ const createTsxLoader = createLoaderFactory(async resolveFrom => {
 
   return {
     name,
-    import: async id => requireDefault(await tsImport(id, resolveFrom))
+    import: async (id, options) =>
+      resolveDefaultExport(await tsImport(id, resolveFrom), options?.default)
   }
 })
 

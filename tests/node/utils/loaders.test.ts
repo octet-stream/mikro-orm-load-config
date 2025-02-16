@@ -35,7 +35,9 @@ const createLoaderSuite = (name: SuiteName, loader: ModuleLoader) =>
     extnames.forEach(extname => {
       test(`loads ${extname} file`, async () => {
         const expected = await import(join(FIXTURES_ROOT, `config${extname}`))
-        const actual = await loader.import(join(FIXTURES_ROOT, "config.ts"))
+        const actual = await loader.import(join(FIXTURES_ROOT, "config.ts"), {
+          default: true
+        })
 
         expect(actual).toEqual(expected.default)
       })
@@ -43,7 +45,9 @@ const createLoaderSuite = (name: SuiteName, loader: ModuleLoader) =>
 
     test("resolves Promise exported from a module", async () => {
       const expected = await import("../../fixtures/loaders/promise.ts")
-      const actual = await loader.import(join(FIXTURES_ROOT, "promise.ts"))
+      const actual = await loader.import(join(FIXTURES_ROOT, "promise.ts"), {
+        default: true
+      })
 
       expect(actual).toEqual(await expected.default)
     })
@@ -117,7 +121,9 @@ describe("native", () => {
     const expected = await import("../../fixtures/loaders/config.ts")
 
     const loader = await createLoader(FIXTURES_ROOT, {loader: "native"})
-    const actual = await loader.import(join(FIXTURES_ROOT, "config.js"))
+    const actual = await loader.import(join(FIXTURES_ROOT, "config.js"), {
+      default: true
+    })
 
     expect(actual).toEqual(expected.default)
   })
@@ -126,7 +132,9 @@ describe("native", () => {
     const expected = await import("../../fixtures/loaders/promise.ts")
 
     const loader = await createLoader(FIXTURES_ROOT, {loader: "native"})
-    const actual = await loader.import(join(FIXTURES_ROOT, "promise.js"))
+    const actual = await loader.import(join(FIXTURES_ROOT, "promise.js"), {
+      default: true
+    })
 
     expect(actual).toEqual(await expected.default)
   })
