@@ -32,8 +32,7 @@ const {discoverEntities} = await import("mikro-orm-load-config/discovery")
 const {Configuration} = await import("@mikro-orm/core")
 
 // Returns async iterator function called `discovery`
-const discovery = discoverEntities("**/*.ts", {
-  cwd: path.resolve("tests", "fixtures", "entities"),
+const discovery = discoverEntities("tests/fixtures/entities/**/*.ts", {
   loader: "tsx" // The `loader` defaults to jiti, but it breaks on class properties, so you have to use tsx. See: https://github.com/unjs/jiti/issues/57
 })
 
